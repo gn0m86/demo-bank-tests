@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Pulpit tests', () => {
-  test('quick payment with correct data', async ({ page }) => {
+  test.only('quick payment with correct data', async ({ page }) => {
     // Arrange
     const url = 'https://demo-bank.vercel.app/';
     const userId = 'testerLO';
@@ -22,19 +22,21 @@ test.describe('Pulpit tests', () => {
     await page.locator('#widget_1_transfer_title').fill(transferTitle);
 
     await page.getByRole('button', { name: 'wykonaj' }).click();
-    // await page.locator('#execute_btn').click();
-    await page.getByTestId('close-button').click();
 
     // Assert
+    const actualMessage = await page.locator('#show_messages').innerText();
+    console.log('Actual message:', actualMessage);
     await expect(page.locator('#show_messages')).toHaveText(
       `Przelew wykonany! ${expectedTransferReceiver} - ${transferAmount},00PLN - ${transferTitle}`,
     );
+
+    await page.getByTestId('close-button').click();
   });
 
   test('successful mobile top-up', async ({ page }) => {
     await page.goto('https://demo-bank.vercel.app/');
     await page.getByTestId('login-input').fill('testerLO');
-    await page.getByTestId('password-input').fill('password');
+    await page.getByTestId('password-input').fill('password123');
     await page.getByTestId('login-button').click();
 
     await page.locator('#widget_1_topup_receiver').selectOption('500 xxx xxx');
